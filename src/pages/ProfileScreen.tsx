@@ -27,7 +27,6 @@ const ProfileScreen: React.FC = () => {
   const [favoriteMovieTitles, setFavoriteMovieTitles] = useState<string[]>([]);
   const [recentWatchTitles, setRecentWatchTitles] = useState<string[]>([]);
   const [genreNames, setGenreNames] = useState<string[]>([]);
-  const profileId = id || currentUserId;
  
 useEffect(() => {
   const fetchProfileAndData = async () => {

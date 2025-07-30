@@ -72,7 +72,7 @@ export const CommentSection = ({ discussionId }: { discussionId: string }) => {
     return () => {
       supabase.removeChannel(subscription);
     };
-  }, []);
+  }, );
 
   return (
     <div>
