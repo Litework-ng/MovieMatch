@@ -1,0 +1,36 @@
+.edit-profile-container {
+  padding: 20px;
+  background: var(--background);
+  color: var(--textPrimary);
+  min-height: 100vh;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: var(--secondary);
+  color: var(--textPrimary);
+}
+
+.save-button {
+  margin-top: 15px;
+  background: var(--primary);
+  color: var(--buttonText);
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}

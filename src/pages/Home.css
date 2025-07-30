@@ -1,0 +1,209 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+:root {
+  --primary: #4B0082;
+  --secondary: #9370DB;
+  --accent: #E0B0FF;
+  --background: #1E1E2F;
+  --textPrimary: #FFFFFF;
+  --textSecondary: #D3D3D3;
+  --button: #9370DB;
+  --buttonText: #FFFFFF;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
+.home-container {
+  background-color: var(--background);
+  color: var(--textPrimary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: var(--primary);
+}
+
+.logo {
+  font-size: 1.5rem;
+  color: var(--accent);
+}
+
+.header-icons .icon {
+  margin-left: 15px;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.home-main {
+  padding: 20px;
+}
+
+.movie-of-week {
+  margin-bottom: 30px;
+}
+
+.movie-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.movie-content img {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 10px;
+  display: block;
+  margin: 0 auto;
+  margin-top: 30px;
+}
+
+.movie-details {
+  color: var(--textPrimary);
+  text-align: left;
+}
+
+.movie-details h3 {
+  margin-top: 0;
+  color: var(--primary);
+}
+
+.movie-details p {
+  margin-bottom: 10px;
+  color: var(--textSecondary);
+}
+
+.movie-details button {
+  background-color: var(--secondary);
+  color: var(--buttonText);
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+section h2 {
+  margin-top: 20px;
+}
+
+.carousel {
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
+  padding: 10px 0;
+}
+
+.carousel-item {
+  flex: 0 0 auto;
+  width: 120px;
+  text-align: center;
+}
+
+.carousel-item img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.floating-matches-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: var(--secondary);
+  color: var(--buttonText);
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 10px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+  position: relative;
+}
+
+.stream-links {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.stream-links li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  font-weight: 500;
+  color:#222;
+}
+
+.modal-content button {
+  background: #222;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+
+@media (min-width: 768px) {
+  .logo {
+    font-size: 2rem;
+  }
+  .movie-content {
+    flex-direction: row;
+    align-items: center;
+    padding: 0 100px;
+  }
+
+  .movie-content img {
+    max-width: 500px;
+    margin: 50px 0;
+
+  }
+
+  .movie-details {
+    margin-left: 50px;
+    max-width: 500px;
+  }
+
+  .carousel-item {
+    width: 150px;
+    margin-left: 50px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .carousel-item {
+    width: 180px;
+  }
+}

@@ -1,0 +1,32 @@
+.matches-container {
+  padding: 20px;
+  background: var(--background);
+  color: var(--textPrimary);
+  min-height: 100vh;
+}
+
+.matches-list {
+  list-style: none;
+  padding: 0;
+}
+
+.match-card {
+  background: var(--secondary);
+  margin-bottom: 15px;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.match-actions {
+  margin-top: 10px;
+}
+
+.match-actions button {
+  margin-right: 10px;
+  background: var(--primary);
+  color: var(--buttonText);
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}

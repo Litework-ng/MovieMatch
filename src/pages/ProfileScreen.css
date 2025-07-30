@@ -1,0 +1,16 @@
+.profile-container {
+  padding: 20px;
+  background: var(--background);
+  color: var(--textPrimary);
+  min-height: 100vh;
+}
+
+.profile-container button {
+  background: var(--primary);
+  color: var(--buttonText);
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 20px;
+}

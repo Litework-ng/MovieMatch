@@ -1,0 +1,71 @@
+.discussion-container {
+  padding: 20px;
+  background: var(--background);
+  color: var(--textPrimary);
+  min-height: 100vh;
+}
+
+.movie-info {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.movie-poster {
+  width: 120px;
+  height: auto;
+  border-radius: 8px;
+}
+
+.comment-section {
+  margin-top: 20px;
+}
+
+.comment-input textarea {
+  width: 100%;
+  min-height: 80px;
+  border-radius: 6px;
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+.comment-input button {
+  margin-top: 10px;
+  background: var(--primary);
+  color: var(--buttonText);
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.comment-list {
+  list-style: none;
+  padding: 0;
+}
+
+.comment-card {
+  background: var(--secondary);
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 6px;
+  position: relative;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.delete-button {
+  background: transparent;
+  border: none;
+  color: red;
+  font-size: 14px;
+  cursor: pointer;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
