@@ -1,6 +1,6 @@
 import { useState, FormEvent } from 'react';
 import { supabase } from '../services/supabase';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,  Link } from 'react-router-dom';
 import './Signup.css';
 
 const Signup = () => {
@@ -22,7 +22,7 @@ const Signup = () => {
 
   return (
     <div className="signup-container">
-      <h1 className="login-header">CineMatch</h1>
+      <h1 className="login-header">FlicksMatch</h1>
       <p className="login-subheader">Connect with Movie lovers like you</p>
       <form onSubmit={handleSignup} className="signup-form">
         <input
@@ -43,6 +43,10 @@ const Signup = () => {
         />
         <button type="submit"  className="login-button">Sign Up</button>
       </form>
+      <p>
+      Already have an account? <Link to="/">Log in</Link>
+    </p>
+
     </div>
   );
 };
