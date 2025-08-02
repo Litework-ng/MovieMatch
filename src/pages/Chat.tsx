@@ -46,14 +46,7 @@ const Chat: React.FC = () => {
       });
 
     // --- realtime subscription for only this convo ---
-    interface SupabasePayload<T> {
-      new: T;
-      old: T | null;
-    }
-
-    interface SupabaseSubscription {
-      unsubscribe: () => Promise<void>;
-    }
+   
 
     const subscription = supabase
       .channel('messages')
