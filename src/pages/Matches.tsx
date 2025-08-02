@@ -2,16 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../services/supabase';
 import { useNavigate } from 'react-router-dom';
 import './Matches.css';
-
-type MatchProfile = {
-  id: string;
-  name: string;
-  age: number;
-  bio: string;
-};
+import { calculateMatch, MatchResult } from '../utils/matchUsers';
+import { enrichUserProfile } from '../utils/enrichUserProfile';
 
 const Matches: React.FC = () => {
-  const [matches, setMatches] = useState<MatchProfile[]>([]);
+  const [matches, setMatches] = useState<MatchResult[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,17 +14,24 @@ const Matches: React.FC = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data, error } = await supabase
+      const { data: myProfileRaw } = await supabase
         .from('Profiles')
-        .select('id, name, age, bio')
-        .neq('id', user.id); // Replace with real match logic
+        .select('*')
+        .eq('id', user.id)
+        .single();
 
-      if (error) {
-        console.error('Error fetching matches:', error);
-        return;
-      }
+      const { data: othersRaw } = await supabase
+        .from('Profiles')
+        .select('*')
+        .neq('id', user.id);
 
-      setMatches(data || []);
+      if (!myProfileRaw || !othersRaw) return;
+
+      const myProfile = await enrichUserProfile(myProfileRaw);
+      const otherProfiles = await Promise.all(othersRaw.map(enrichUserProfile));
+
+      const scoredMatches = calculateMatch(myProfile, otherProfiles);
+      setMatches(scoredMatches);
     };
 
     fetchMatches();
@@ -39,13 +41,14 @@ const Matches: React.FC = () => {
     <div className="matches-container">
       <h2>Your Matches</h2>
       <ul className="matches-list">
-        {matches.map((match) => (
-          <li key={match.id} className="match-card">
-            <h3>{match.name}, {match.age}</h3>
-            <p>{match.bio}</p>
+        {matches.map(({ user, reason }) => (
+          <li key={user.id} className="match-card">
+            <h3>{user.name}, {user.age}</h3>
+            <p>{user.bio}</p>
+            <p className="match-reason">{reason}</p>
             <div className="match-actions">
-              <button onClick={() => navigate(`/profile/${match.id}`)}>View Profile</button>
-              <button onClick={() => navigate(`/chat/${match.id}`)}>Message</button>
+              <button onClick={() => navigate(`/profile/${user.id}`)}>View Profile</button>
+              <button onClick={() => navigate(`/chat/${user.id}`)}>Message</button>
             </div>
           </li>
         ))}

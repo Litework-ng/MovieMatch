@@ -97,10 +97,15 @@ section h2 {
 .carousel {
   display: flex;
   overflow-x: auto;
-  gap: 10px;
+   scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE 10+ */
+  gap: 2px;
   padding: 10px 0;
 }
 
+.carousel::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
 .carousel-item {
   flex: 0 0 auto;
   width: 120px;

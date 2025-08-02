@@ -27,6 +27,24 @@ export const getPopularMovies = async () => {
   }
 };
 
+// Fetch Top 10 TV Shows
+export const getTopTVShows = async () => {
+  try {
+    const res = await axios.get(`${BASE_URL}/tv/popular`, {
+      params: {
+        api_key: process.env.TMDB_API_KEY,
+        language: 'en-US',
+        page: 1,
+      },
+    });
+    return res.data.results.slice(0, 10); // top 10
+  } catch (err) {
+    console.error('Error fetching top TV shows:', err);
+    return [];
+  }
+};
+
+
 export const getGenres = async () => {
   try {
     const res = await axios.get(`${BASE_URL}/genre/movie/list`, {

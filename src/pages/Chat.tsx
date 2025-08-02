@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 import './Chat.css';
@@ -15,77 +15,113 @@ const Chat: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const [currentUserId, setCurrentUserId] = useState('');
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // 1) Load current user once
   useEffect(() => {
-    const getCurrentUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+    supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) setCurrentUserId(user.id);
-    };
-
-    getCurrentUser();
+    });
   }, []);
 
+  // 2) Fetch history + subscribe, but only after we know currentUserId
   useEffect(() => {
-    const fetchMessages = async () => {
-      if (!currentUserId || !userId) return;
+    if (!currentUserId || !userId) return;
 
-      const { data, error } = await supabase
-        .from('messages')
-        .select('*')
-        .order('created_at', { ascending: true });
-
-      if (error) {
-        console.error('Error fetching messages:', error);
-      } else {
-        const filtered = data?.filter(
-          (msg: Message) =>
-            (msg.sender_id === currentUserId && msg.receiver_id === userId) ||
-            (msg.sender_id === userId && msg.receiver_id === currentUserId)
-        );
-        setMessages(filtered || []);
-      }
-    };
-
-    fetchMessages();
-
-    const channel = supabase
-      .channel('messages-room')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'messages',
-      }, (payload) => {
-        const msg: Message = payload.new as Message;
-        if (
-          (msg.sender_id === currentUserId && msg.receiver_id === userId) ||
-          (msg.sender_id === userId && msg.receiver_id === currentUserId)
-        ) {
-          setMessages((prev) => [...prev, msg]);
+    // --- fetch conversation history ---
+    supabase
+      .from('messages')
+      .select('*')
+      .order('created_at', { ascending: true })
+      .then(({ data, error }) => {
+        if (data) {
+          const convo = data.filter(
+            (m) =>
+              (m.sender_id === currentUserId && m.receiver_id === userId) ||
+              (m.sender_id === userId && m.receiver_id === currentUserId)
+          );
+          setMessages(convo);
         }
-      })
+      });
+
+    // --- realtime subscription for only this convo ---
+    interface SupabasePayload<T> {
+      new: T;
+      old: T | null;
+    }
+
+    interface SupabaseSubscription {
+      unsubscribe: () => Promise<void>;
+    }
+
+    const subscription = supabase
+      .channel('messages')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `receiver_id=eq.${currentUserId},sender_id=eq.${userId}`
+        },
+        (payload) => {
+          setMessages((prev) => [...prev, payload.new as Message]);
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `receiver_id=eq.${userId},sender_id=eq.${currentUserId}`
+        },
+        (payload) => {
+          setMessages((prev) => [...prev, payload.new as Message]);
+        }
+      )
       .subscribe();
 
+    // cleanup
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(subscription);
     };
-  }, [userId, currentUserId]);
+  }, [currentUserId, userId]);
 
-  const sendMessage = async () => {
-    if (newMessage.trim() === '' || !currentUserId) return;
+  // auto-scroll on new message
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
-    const { error } = await supabase.from('messages').insert({
+ const sendMessage = async () => {
+  if (!newMessage.trim() || !currentUserId || !userId) return;
+
+  console.log('Inserting message:', {
+    sender_id: currentUserId,
+    receiver_id: userId,
+    content: newMessage.trim(),
+  });
+
+  const { data, error } = await supabase
+    .from('messages')
+    .insert({
       sender_id: currentUserId,
       receiver_id: userId,
-      content: newMessage,
-    });
+      content: newMessage.trim(),
+    })
+    .select();  // return the inserted row
 
-    if (error) {
-      console.error('Error sending message:', error);
-    } else {
-      setNewMessage('');
-    }
-  };
+  if (error) {
+    console.error('Insert error:', error);
+  } else {
+    console.log('Inserted row:', data);
+    setNewMessage('');
+  }
+};
+
+
+  if (!currentUserId) return <p>Loading chat...</p>;
 
   return (
     <div className="chat-container">
@@ -98,14 +134,14 @@ const Chat: React.FC = () => {
             {msg.content}
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
-
       <div className="input-container">
         <input
-          type="text"
-          placeholder="Type your message..."
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+          placeholder="Type your message..."
         />
         <button onClick={sendMessage}>Send</button>
       </div>

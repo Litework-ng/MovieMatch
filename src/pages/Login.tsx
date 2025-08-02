@@ -77,7 +77,7 @@ const Login = () => {
         <button type="submit"  className="login-button">Log In</button>
       </form>
       <p>
-        Don't have an account? <Link to="/login">Sign up</Link>
+        Don't have an account? <Link to="/signup">Sign up</Link>
       </p>
 
     </div>
