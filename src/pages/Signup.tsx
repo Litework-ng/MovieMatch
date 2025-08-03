@@ -1,4 +1,5 @@
 import { useState, FormEvent } from 'react';
+import { toast } from 'react-toastify';
 import { supabase } from '../services/supabase';
 import { useNavigate,  Link } from 'react-router-dom';
 import './Signup.css';
@@ -13,9 +14,9 @@ const Signup = () => {
     const { error } = await supabase.auth.signUp({ email, password });
 
     if (error) {
-      alert(error.message);
+      toast.error(error.message);
     } else {
-      alert('Signup successful. Please check your email to confirm.');
+      toast.success('Signup successful. Please check your email to confirm.');
       navigate('/');
     }
   };

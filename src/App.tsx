@@ -8,26 +8,32 @@ import Messages from './pages/Message';
 import Chat from './pages/Chat';
 import Profile from './pages/ProfileScreen';
 import Matches from './pages/Matches';
-import EditProfile from './pages/EditProfile'
-import Discussion from './pages/Discussion'
+import EditProfile from './pages/EditProfile';
+import Discussion from './pages/Discussion';
+import AppToastContainer from './components/AppToastContainer';
+import AuthRedirectHandler from './pages/AuthRedirectHandler';
+import PrivateRoute from './components/PrivateRoute';
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/" element={<Login />} />
-        <Route path="/profile-setup" element={<ProfileSetup />} />
-        <Route path="/match-list" element={<MatchList />} />
-        <Route path="/matches" element={<Matches />} />
-        <Route path="/profile/:id" element={<Profile />} />
-        <Route path="/messages" element={<Messages />} />
-        <Route path="/chat/:userId" element={<Chat />} />
-        <Route path="/home" element={<Home />} />
-        <Route path = "/edit-profile" element={<EditProfile/>}/>
-        <Route path="/discussion/:movieId" element={<Discussion />} />
-
-      </Routes>
-    </Router>
+    <>
+      <Router>
+        <Routes>
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/profile-setup" element={<PrivateRoute><ProfileSetup /></PrivateRoute>} />
+          <Route path="/match-list" element={<PrivateRoute><MatchList /></PrivateRoute>} />
+          <Route path="/matches" element={<PrivateRoute><Matches /></PrivateRoute>} />
+          <Route path="/profile/:id" element={<PrivateRoute><Profile /></PrivateRoute>} />
+          <Route path="/messages" element={<PrivateRoute><Messages /></PrivateRoute>} />
+          <Route path="/chat/:userId" element={<PrivateRoute><Chat /></PrivateRoute>} />
+          <Route path = "/edit-profile" element={<PrivateRoute><EditProfile/></PrivateRoute>}/>
+          <Route path="/discussion/:movieId" element={<PrivateRoute><Discussion /></PrivateRoute>} />
+          <Route path="/auth-redirect" element={<AuthRedirectHandler />} />
+        </Routes>
+      </Router>
+      <AppToastContainer />
+    </>
   );
 }
 

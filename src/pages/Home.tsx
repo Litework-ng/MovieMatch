@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import './Home.css';
 import { supabase } from '../services/supabase';
@@ -15,6 +16,7 @@ const Home: React.FC = () => {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [streamingProviders, setStreamingProviders] = useState<any[]>([]);
   const [showStreamModal, setShowStreamModal] = useState(false);
+  const [loadingStream, setLoadingStream] = useState(false);
 
   useEffect(() => {
     const getCurrentUser = async () => {
@@ -70,17 +72,28 @@ const Home: React.FC = () => {
                 <p>{movieOfWeek.overview}</p>
                 <button onClick={() => navigate(`/discussion/${movieOfWeek.id}`)}>💭 See Discussions</button>
                 <button
-                onClick={async () => {
-                  if (movieOfWeek) {
-                    const platforms = await getStreamingAvailability(movieOfWeek.title);
-                    setStreamingProviders(platforms);
-                    console.log(platforms)
-                    setShowStreamModal(true);
-                  }
-                }}
-              >
-                🔗 Where to Stream
-              </button>
+                  disabled={loadingStream}
+                  onClick={async () => {
+                    if (movieOfWeek) {
+                      setLoadingStream(true);
+                      try {
+                        const platforms = await getStreamingAvailability(movieOfWeek.title);
+                        setStreamingProviders(platforms);
+                        setShowStreamModal(true);
+                        if (!platforms.length) {
+                          toast.info('No streaming platforms found for this region.');
+                        }
+                      } catch (err) {
+                        toast.error('Failed to fetch streaming platforms.');
+                      } finally {
+                        setLoadingStream(false);
+                      }
+                    }
+                  }}
+                  style={{ opacity: loadingStream ? 0.7 : 1 }}
+                >
+                  {loadingStream ? 'Loading...' : '🔗 Where to Stream'}
+                </button>
               </div>
             </div>
           </section>

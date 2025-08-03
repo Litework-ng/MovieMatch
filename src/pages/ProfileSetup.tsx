@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabase'; // ensure this import is correct in your project
 import './ProfileSetup.css';
@@ -109,7 +110,7 @@ const ProfileSetup: React.FC = () => {
   const handleSubmit = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      alert('User not authenticated');
+      toast.error('User not authenticated');
       return;
     }
 
@@ -126,8 +127,9 @@ const ProfileSetup: React.FC = () => {
 
     if (error) {
       console.error('Error saving profile:', error);
-      alert('Error saving profile: ' + error.message);
+      toast.error('Error saving profile: ' + error.message);
     } else {
+      toast.success('Profile saved!');
       navigate('/home');
     }
   };

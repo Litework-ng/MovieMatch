@@ -1,4 +1,5 @@
 import { useState, FormEvent } from 'react';
+import { toast } from 'react-toastify';
 import { supabase } from '../services/supabase';
 import { useNavigate, Link } from 'react-router-dom';
 import './Login.css';
@@ -17,14 +18,14 @@ const Login = () => {
   });
 
   if (loginError) {
-    alert(loginError.message);
+    toast.error(loginError.message);
     return;
   }
 
   const userId = authData?.user?.id;
 
   if (!userId) {
-    alert("User ID not found after login.");
+    toast.error("User ID not found after login.");
     return;
   }
 
@@ -38,7 +39,7 @@ const Login = () => {
   if (profileError && profileError.code !== 'PGRST116') {
     // Something went wrong (not just missing row)
     console.error('Error fetching profile:', profileError);
-    alert('Error fetching profile.');
+    toast.error('Error fetching profile.');
     return;
   }
 
