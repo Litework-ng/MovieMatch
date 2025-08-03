@@ -18,23 +18,23 @@ const Chat: React.FC = () => {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // 1) Load current user once
+  // Load current user once
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) setCurrentUserId(user.id);
     });
   }, []);
 
-  // 2) Fetch history + subscribe, but only after we know currentUserId
+  // Fetch history and subscribe to live inserts
   useEffect(() => {
     if (!currentUserId || !userId) return;
 
-    // --- fetch conversation history ---
+    // 1) Fetch existing conversation
     supabase
       .from('messages')
       .select('*')
       .order('created_at', { ascending: true })
-      .then(({ data, error }) => {
+      .then(({ data }) => {
         if (data) {
           const convo = data.filter(
             (m) =>
@@ -45,76 +45,47 @@ const Chat: React.FC = () => {
         }
       });
 
-    // --- realtime subscription for only this convo ---
-   
-
-    const subscription = supabase
-      .channel('messages')
+    // 2) Subscribe to ALL new messages, filter in JS using Realtime channel
+    const channel = supabase.channel('messages-insert-channel')
       .on(
         'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-          filter: `receiver_id=eq.${currentUserId},sender_id=eq.${userId}`
-        },
+        { event: 'INSERT', schema: 'public', table: 'messages' },
         (payload) => {
-          setMessages((prev) => [...prev, payload.new as Message]);
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-          filter: `receiver_id=eq.${userId},sender_id=eq.${currentUserId}`
-        },
-        (payload) => {
-          setMessages((prev) => [...prev, payload.new as Message]);
+          const m = payload.new as Message;
+          if (
+            (m.sender_id === currentUserId && m.receiver_id === userId) ||
+            (m.sender_id === userId && m.receiver_id === currentUserId)
+          ) {
+            setMessages((prev) => [...prev, m]);
+          }
         }
       )
       .subscribe();
 
-    // cleanup
+    // Cleanup on unmount or deps change
     return () => {
-      supabase.removeChannel(subscription);
+      supabase.removeChannel(channel);
     };
   }, [currentUserId, userId]);
 
-  // auto-scroll on new message
+  // Auto-scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
- const sendMessage = async () => {
-  if (!newMessage.trim() || !currentUserId || !userId) return;
+  const sendMessage = async () => {
+    if (!newMessage.trim() || !currentUserId || !userId) return;
 
-  console.log('Inserting message:', {
-    sender_id: currentUserId,
-    receiver_id: userId,
-    content: newMessage.trim(),
-  });
-
-  const { data, error } = await supabase
-    .from('messages')
-    .insert({
+    await supabase.from('messages').insert({
       sender_id: currentUserId,
       receiver_id: userId,
       content: newMessage.trim(),
-    })
-    .select();  // return the inserted row
+    });
 
-  if (error) {
-    console.error('Insert error:', error);
-  } else {
-    console.log('Inserted row:', data);
     setNewMessage('');
-  }
-};
+  };
 
-
-  if (!currentUserId) return <p>Loading chat...</p>;
+  if (!currentUserId) return <p>Loading chat…</p>;
 
   return (
     <div className="chat-container">

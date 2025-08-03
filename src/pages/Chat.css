@@ -1,4 +1,15 @@
 .chat-container {
+  /* Color variables for chat, matching Home.css */
+  --primary: #4B0082;
+  --secondary: #9370DB;
+  --accent: #E0B0FF;
+  --background: #1E1E2F;
+  --textPrimary: #FFFFFF;
+  --textSecondary: #D3D3D3;
+  --button: #9370DB;
+  --buttonText: #FFFFFF;
+}
+.chat-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -20,38 +31,45 @@
   word-wrap: break-word;
 }
 
+
 .sent {
-  background-color: #4a90e2;
-  color: white;
+  background-color: var(--primary);
+  color: var(--textPrimary);
   align-self: flex-end;     /* ← right side */
   border-bottom-right-radius: 4px;
 }
 
+
 .received {
-  background-color: #e0e0e0;
-  color: #333;
+  background-color: var(--accent);
+  color: var(--background);
   align-self: flex-start;   /* ← left side */
   border-bottom-left-radius: 4px;
 }
 
+
 .input-container {
   display: flex;
   padding: 10px;
-  border-top: 1px solid #ccc;
+  border-top: 1px solid var(--secondary);
 }
+
 
 input {
   flex: 1;
   padding: 10px;
   border-radius: 20px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--secondary);
+  background: var(--background);
+  color: var(--textPrimary);
 }
+
 
 button {
   margin-left: 10px;
   padding: 10px 18px;
   border-radius: 20px;
   border: none;
-  background-color: #4a90e2;
-  color: white;
+  background-color: var(--button);
+  color: var(--buttonText);
 }
