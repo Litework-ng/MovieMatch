@@ -28,7 +28,7 @@ const Alert: React.FC<AlertProps> = ({ message, onDismiss, onLogin }) => {
         minWidth: 300,
         textAlign: 'center'
       }}>
-        <p style={{ marginBottom: 20 }}>{message}</p>
+        <p style={{ marginBottom: 20, color:'#000' }}>{message}</p>
         <button onClick={onLogin} style={{ marginRight: 10, padding: '0.5rem 1rem', borderRadius: 5, background: '#4B0082', color: 'white', border: 'none' }}>Go to Login</button>
         <button onClick={onDismiss} style={{ padding: '0.5rem 1rem', borderRadius: 5, background: '#ccc', border: 'none' }}>Dismiss</button>
       </div>
