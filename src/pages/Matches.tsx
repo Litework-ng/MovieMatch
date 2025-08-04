@@ -16,12 +16,6 @@ const Matches: React.FC = () => {
       if (cached) {
         setMatches(JSON.parse(cached));
         return;
-      } else {
-        // If there are matches in state from a previous calculation (e.g., before localStorage was used),
-        // save them to localStorage for persistence
-        if (matches.length > 0) {
-          localStorage.setItem('user_matches', JSON.stringify(matches));
-        }
       }
 
       const { data: { user } } = await supabase.auth.getUser();
@@ -52,7 +46,7 @@ const Matches: React.FC = () => {
     };
 
     fetchMatches();
-  }, [matches]);
+  }, []);
 
   return (
     <div className="matches-container">
