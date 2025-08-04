@@ -1,5 +1,5 @@
 import React, { useEffect, useState, PropsWithChildren } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 
 type PrivateRouteProps = PropsWithChildren<{}>;
@@ -7,6 +7,7 @@ type PrivateRouteProps = PropsWithChildren<{}>;
 const PrivateRoute = ({ children }: PrivateRouteProps) => {
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -17,9 +18,10 @@ const PrivateRoute = ({ children }: PrivateRouteProps) => {
     checkAuth();
   }, []);
 
-  if (loading) return <></>; // always return a valid React element
+  if (loading) return <></>;
   if (authenticated) return <>{children}</>;
-  return <Navigate to="/" replace />;
+  // Redirect to home with hash to trigger alert
+  return <Navigate to={{ pathname: '/', hash: '#unauth' }} state={{ from: location }} replace />;
 };
 
 export default PrivateRoute;

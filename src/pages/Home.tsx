@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import Alert from '../components/Alert';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import './Home.css';
@@ -17,6 +18,7 @@ const Home: React.FC = () => {
   const [streamingProviders, setStreamingProviders] = useState<any[]>([]);
   const [showStreamModal, setShowStreamModal] = useState(false);
   const [loadingStream, setLoadingStream] = useState(false);
+  const [showAuthAlert, setShowAuthAlert] = useState<boolean>(false);
 
   useEffect(() => {
     const getCurrentUser = async () => {
@@ -24,6 +26,12 @@ const Home: React.FC = () => {
       if (user) setCurrentUserId(user.id);
     };
     getCurrentUser();
+    // Check for unauthenticated redirect
+    if (window.location.hash === '#unauth') {
+      setShowAuthAlert(true);
+      // Remove hash so it doesn't persist
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
   }, []);
 
   useEffect(() => {
@@ -53,6 +61,13 @@ const Home: React.FC = () => {
 
   return (
     <div className="home-container">
+      {showAuthAlert && (
+        <Alert
+          message="You must be logged in to access that page."
+          onDismiss={() => setShowAuthAlert(false)}
+          onLogin={() => { setShowAuthAlert(false); navigate('/login'); }}
+        />
+      )}
       <header className="home-header">
         <h1 className="logo">CineMatch</h1>
         <div className="header-icons">
