@@ -16,14 +16,24 @@ const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [partnerName, setPartnerName] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Load current user once
+  // Load current user and chat partner's name
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (user) setCurrentUserId(user.id);
+      if (userId) {
+        // Fetch chat partner's name from Profiles
+        const { data: profile } = await supabase
+          .from('Profiles')
+          .select('name')
+          .eq('id', userId)
+          .single();
+        setPartnerName(profile?.name || 'User');
+      }
     });
-  }, []);
+  }, [userId]);
 
   // Fetch history and subscribe to live inserts
   useEffect(() => {
@@ -87,15 +97,39 @@ const Chat: React.FC = () => {
 
   if (!currentUserId) return <p>Loading chat…</p>;
 
+  // Helper: group messages by date
+  const groupMessagesByDate = (msgs: Message[]) => {
+    return msgs.reduce((acc, msg) => {
+      const date = new Date(msg.created_at).toLocaleDateString();
+      if (!acc[date]) acc[date] = [];
+      acc[date].push(msg);
+      return acc;
+    }, {} as Record<string, Message[]>);
+  };
+
+  const grouped = groupMessagesByDate(messages);
+
   return (
     <div className="chat-container">
       <div className="messages">
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`message ${msg.sender_id === currentUserId ? 'sent' : 'received'}`}
-          >
-            {msg.content}
+        <div className="chat-header" style={{textAlign:'center', marginBottom:10, fontWeight:'bold'}}>
+          Chatting with {partnerName}
+        </div>
+        {Object.entries(grouped).map(([date, msgs]) => (
+          <div key={date} style={{ display: 'flex', flexDirection: 'column' }}>
+            <div className="date-group-label" style={{ textAlign: 'center', color: '#888', fontSize: '0.9em', margin: '10px 0' }}>{date}</div>
+            {msgs.map((msg) => (
+              <div
+                key={msg.id}
+                className={`message ${msg.sender_id === currentUserId ? 'sent' : 'received'}`}
+                title={new Date(msg.created_at).toLocaleString()}
+              >
+                <div>{msg.content}</div>
+                <div style={{ fontSize: '0.75em', color: '#bbb', marginTop: 2, textAlign: msg.sender_id === currentUserId ? 'right' : 'left' }}>
+                  {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </div>
+              </div>
+            ))}
           </div>
         ))}
         <div ref={messagesEndRef} />

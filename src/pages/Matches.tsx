@@ -11,6 +11,19 @@ const Matches: React.FC = () => {
 
   useEffect(() => {
     const fetchMatches = async () => {
+      // Try to load from localStorage first
+      const cached = localStorage.getItem('user_matches');
+      if (cached) {
+        setMatches(JSON.parse(cached));
+        return;
+      } else {
+        // If there are matches in state from a previous calculation (e.g., before localStorage was used),
+        // save them to localStorage for persistence
+        if (matches.length > 0) {
+          localStorage.setItem('user_matches', JSON.stringify(matches));
+        }
+      }
+
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
@@ -31,7 +44,11 @@ const Matches: React.FC = () => {
       const otherProfiles = await Promise.all(othersRaw.map(enrichUserProfile));
 
       const scoredMatches = calculateMatch(myProfile, otherProfiles);
-      setMatches(scoredMatches);
+      // Only include matches above the threshold
+      const threshold = 20;
+      const filteredMatches = scoredMatches.filter(m => m.matchScore >= threshold);
+      setMatches(filteredMatches);
+      localStorage.setItem('user_matches', JSON.stringify(filteredMatches));
     };
 
     fetchMatches();
