@@ -45,7 +45,7 @@ const Login = () => {
 
   if (profile) {
     // Existing user
-    navigate('/home');
+    navigate('/');
   } else {
     // New user
     navigate('/profile-setup');

@@ -52,7 +52,7 @@ const Matches: React.FC = () => {
     };
 
     fetchMatches();
-  }, []);
+  },);
 
   return (
     <div className="matches-container">
